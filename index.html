@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prophetin</title>
+    <style>
+        :root {
+            --bg: #020202;
+            --diseased-green: #0d210b;
+            --acid-glow: #3cd070;
+            --ui-panel: rgba(5, 5, 5, 0.95);
+            --border: #142812;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg);
+            color: #efefef;
+            font-family: -apple-system, system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        /* The Cracks - Now thin, vein-like, and behind the browser */
+        .cracks-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1; /* Behind browser */
+        }
+
+        .vein {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 150px;
+            background: linear-gradient(to var(--dir), var(--acid-glow), transparent);
+            opacity: 0.3;
+            filter: blur(1px);
+            animation: flicker 8s infinite;
+        }
+
+        .left-vein {
+            left: 0;
+            --dir: right;
+            clip-path: polygon(0 0, 2% 0, 15% 20%, 2% 35%, 20% 50%, 5% 70%, 15% 85%, 2% 100%, 0 100%);
+        }
+
+        .right-vein {
+            right: 0;
+            --dir: left;
+            clip-path: polygon(100% 0, 98% 0, 85% 15%, 98% 30%, 80% 45%, 95% 65%, 82% 80%, 98% 100%, 100% 100%);
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+
+        .top-bar {
+            height: 60px;
+            background: var(--ui-panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            z-index: 110;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .btn {
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--acid-glow);
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--diseased-green);
+            color: #fff;
+            box-shadow: 0 0 8px var(--acid-glow);
+        }
+
+        .address-container {
+            flex-grow: 1;
+        }
+
+        .address-bar {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--acid-glow);
+            padding: 8px 12px;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+
+        .browser-viewport {
+            position: absolute;
+            top: 70px;
+            bottom: 50px;
+            left: 20px;
+            right: 20px;
+            background: #fff;
+            z-index: 10; /* Above the cracks */
+            border-radius: 2px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            font-size: 9px;
+            letter-spacing: 5px;
+            color: #222;
+            z-index: 110;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cracks-container">
+        <div class="vein left-vein"></div>
+        <div class="vein right-vein"></div>
+    </div>
+
+    <header class="top-bar">
+        <div class="nav-controls">
+            <button class="btn" onclick="back()">Back</button>
+            <button class="btn" onclick="reload()">Refresh</button>
+        </div>
+        <div class="address-container">
+            <input type="text" id="url-input" class="address-bar" placeholder="Target destination..." onkeydown="if(event.key==='Enter') navigate()">
+        </div>
+        <button class="btn" style="margin-left: 10px;" onclick="navigate()">GO</button>
+    </header>
+
+    <main class="browser-viewport">
+        <iframe id="viewport" src="about:blank"></iframe>
+    </main>
+
+    <footer class="footer">
+        MORGENSTERN & BACON
+    </footer>
+
+    <script>
+        const frame = document.getElementById('viewport');
+        const input = document.getElementById('url-input');
+
+        function navigate() {
+            let url = input.value.trim();
+            if (!url) return;
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+            frame.src = '/service/' + url;
+        }
+
+        function back() {
+            try { frame.contentWindow.history.back(); } catch (e) {}
+        }
+
+        function reload() {
+            frame.src = frame.src;
+        }
+
+        frame.onload = () => {
+            try {
+                const currentPath = frame.contentWindow.location.pathname;
+                if (currentPath.startsWith('/service/')) {
+                    input.value = currentPath.substring(9);
+                }
+            } catch (e) {}
+        };
+    </script>
+</body>
+</html>
