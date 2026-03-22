@@ -1,7 +1,7 @@
 {
   "name": "prophetin",
   "version": "1.1.0",
-  "description": "Prophetin Browser Proxy - Modern Corrupted UI",
+  "description": "Prophetin",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js"
